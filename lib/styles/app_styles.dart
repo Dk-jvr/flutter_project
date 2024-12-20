@@ -12,7 +12,7 @@ class AppStyles {
           color: Colors.black,
           fontWeight: FontWeight.bold,
           fontSize: 24,
-        ); // Резервный стиль, если titleLarge равно null
+        ); 
   }
 
   // Метод для получения стиля для ввода

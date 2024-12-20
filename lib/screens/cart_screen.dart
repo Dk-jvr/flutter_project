@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
-import 'dart:math';
 import '../utils/promo_code_service.dart';
 import '../utils/promo_code.dart'; // Импортируем модель промокода
+import 'dart:math';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -35,8 +35,14 @@ class _CartScreenState extends State<CartScreen> {
 
   void _applyPromoCode() {
     final promoCode = _promoCodes.firstWhere(
-      (promoCode) => promoCode.name == _promoCode && promoCode.expirationDate.isAfter(DateTime.now()),
-      orElse: () => PromoCode(name: 'default', discount: 0.0, expirationDate: DateTime.now()), // Возвращаем дефолтный промокод
+      (promoCode) =>
+          promoCode.name == _promoCode &&
+          promoCode.expirationDate.isAfter(DateTime.now()),
+      orElse: () => PromoCode(
+        name: 'default',
+        discount: 0.0,
+        expirationDate: DateTime.now(),
+      ),
     );
 
     if (promoCode.name != 'default') {
@@ -68,16 +74,20 @@ class _CartScreenState extends State<CartScreen> {
 
   void _confirmOrder(BuildContext context) {
     final randomOrderNumber = Random().nextInt(100000);
+    final totalWithDiscount = _calculateTotalWithDiscount();
+
     Provider.of<CartProvider>(context, listen: false).clearCart();
 
-    // Показать диалог с подтверждением заказа
     showDialog(
       context: context,
       builder: (ctx) {
         return AlertDialog(
           title: Text('Order Confirmed'),
           content: Text(
-              'Your order №$randomOrderNumber has been placed! \nPayment method: $_paymentMethod\nTotal with discount: \$${_calculateTotalWithDiscount().toStringAsFixed(2)}'),
+            'Your order №$randomOrderNumber has been placed!\n'
+            'Payment method: $_paymentMethod\n'
+            'Total: \$${totalWithDiscount.toStringAsFixed(2)}',
+          ),
           actions: [
             TextButton(
               onPressed: () {
@@ -96,10 +106,12 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   double _calculateTotalWithDiscount() {
-    final cartProvider = Provider.of<CartProvider>(context);
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
     final cartItems = cartProvider.cartItems;
-    double total = cartItems.fold(0.0, (sum, item) => sum + (item.liters * item.beer.price));
-
+    double total = cartItems.fold(
+      0.0,
+      (sum, item) => sum + (item.liters * item.beer.price),
+    );
     return total * (1 - _discount);
   }
 
@@ -107,10 +119,11 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
     final cartItems = cartProvider.cartItems;
+    final totalWithDiscount = _calculateTotalWithDiscount();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Your Cart'),
+title: Text('Your Cart'),
       ),
       body: cartItems.isEmpty
           ? Center(child: Text('Your cart is empty'))
@@ -125,7 +138,9 @@ class _CartScreenState extends State<CartScreen> {
                         leading: Image.asset(item.beer.image, width: 50),
                         title: Text(item.beer.name),
                         subtitle: Text(
-                            'Quantity: ${item.liters.toStringAsFixed(2)} liters\nTotal: \$${(item.liters * item.beer.price).toStringAsFixed(2)}'),
+                          'Quantity: ${item.liters.toStringAsFixed(2)} liters\n'
+                          'Total: \$${(item.liters * item.beer.price).toStringAsFixed(2)}',
+                        ),
                         trailing: IconButton(
                           icon: Icon(Icons.delete),
                           onPressed: () {
@@ -142,7 +157,6 @@ class _CartScreenState extends State<CartScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Радиокнопки для выбора способа оплаты
                       Text(
                         'Select Payment Method:',
                         style: TextStyle(fontSize: 16),
@@ -171,7 +185,6 @@ class _CartScreenState extends State<CartScreen> {
                           },
                         ),
                       ),
-                      // Поле для промокода
                       Text(
                         'Promo Code:',
                         style: TextStyle(fontSize: 16),
@@ -199,7 +212,8 @@ class _CartScreenState extends State<CartScreen> {
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Text(
-                            'Applied promo code: ${_appliedPromoCode!.name}\nDiscount: ${_appliedPromoCode!.discount * 100}%',
+                            'Applied promo code: ${_appliedPromoCode!.name}\n'
+                            'Discount: ${_appliedPromoCode!.discount * 100}%',
                             style: TextStyle(color: Colors.green),
                           ),
                         ),
@@ -218,7 +232,17 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                         ],
                       ),
-                      SizedBox(height: 20),
+                      Divider(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Text(
+                          'Total with discount: \$${totalWithDiscount.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                       Center(
                         child: ElevatedButton(
                           onPressed: () => _confirmOrder(context),

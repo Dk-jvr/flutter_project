@@ -1,7 +1,7 @@
 class Beer {
   final int id;
   final String name;
-  String description; // Теперь описание изменяемое
+  String description;
   final double price;
   final String image;
 

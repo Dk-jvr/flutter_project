@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import '../beer_data.dart'; // Импортируем модель Beer
+import 'package:provider/provider.dart';
+import '../beer_data.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'beer_detail_screen.dart'; // Импортируем экран детальной информации о пиве
-import 'cart_screen.dart'; // Импортируем CartScreen
+import 'beer_detail_screen.dart';
+import 'cart_screen.dart';
+import '../providers/favorites_provider.dart';
+import 'favorites_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,8 +16,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Список пива
   List<Beer> beers = [];
+  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -22,15 +25,15 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchBeers();
   }
 
-  // Функция для получения пива из API или локальных данных
   Future<void> fetchBeers() async {
-    final response = await http.get(Uri.parse('https://raw.githubusercontent.com/Dk-jvr/pivo/main/beers.json'));
+    final response = await http.get(
+      Uri.parse('https://raw.githubusercontent.com/Dk-jvr/pivo/main/beers.json'),
+    );
 
     if (response.statusCode == 200) {
-      // Если запрос успешен, парсим JSON и загружаем пиво
       List<dynamic> jsonList = json.decode(response.body);
       setState(() {
-        beers = Beer.fromJsonList(jsonList); // Преобразуем JSON в объекты Beer
+        beers = Beer.fromJsonList(jsonList);
       });
     } else {
       throw Exception('Failed to load beers');
@@ -41,44 +44,62 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Beer Shop'),
+        title: const Text('Beer Shop'),
         actions: [
           IconButton(
-            icon: Icon(Icons.shopping_cart),
+            icon: const Icon(Icons.shopping_cart),
             onPressed: () {
-              // Переход в корзину
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CartScreen(),
+                  builder: (context) => const CartScreen(),
                 ),
               );
             },
           ),
         ],
       ),
-      body: beers.isEmpty
-          ? Center(child: CircularProgressIndicator()) // Показываем загрузку, если пиво еще не загружено
-          : ListView.builder(
-              itemCount: beers.length,
-              itemBuilder: (context, index) {
-                final beer = beers[index];
-                return ListTile(
-                  leading: Image.asset(beer.image), // Путь к изображению пива
-                  title: Text(beer.name),
-                  subtitle: Text('\$${beer.price.toStringAsFixed(2)}'),
-                  onTap: () {
-                    // Переход на страницу с деталями пива
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BeerDetailScreen(beer: beer),
-                      ),
+      body: _selectedIndex == 0
+          ? beers.isEmpty
+              ? const Center(child: CircularProgressIndicator())
+              : ListView.builder(
+                  itemCount: beers.length,
+                  itemBuilder: (context, index) {
+                    final beer = beers[index];
+                    return ListTile(
+                      leading: Image.asset(beer.image),
+                      title: Text(beer.name),
+                      subtitle: Text('\$${beer.price.toStringAsFixed(2)}'),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BeerDetailScreen(beer: beer),
+                          ),
+                        );
+                      },
                     );
                   },
-                );
-              },
-            ),
+                )
+          : const FavoritesScreen(),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Favorites',
+          ),
+        ],
+      ),
     );
   }
 }

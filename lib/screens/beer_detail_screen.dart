@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
+import '../providers/favorites_provider.dart';
 import '../beer_data.dart';
 import 'cart_screen.dart';
 import '../styles/app_styles.dart';
@@ -35,12 +36,39 @@ class _BeerDetailScreenState extends State<BeerDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final favoritesProvider = Provider.of<FavoritesProvider>(context);
+    final isFavorite = favoritesProvider.favoriteBeers.contains(widget.beer);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.beer.name),
         actions: [
           IconButton(
-            icon: Icon(Icons.shopping_cart),
+            icon: Icon(
+              isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: isFavorite ? Colors.red : null,
+            ),
+            onPressed: () {
+              setState(() {
+                if (isFavorite) {
+                  favoritesProvider.removeFromFavorites(widget.beer);
+                } else {
+                  favoritesProvider.addToFavorites(widget.beer);
+                }
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    isFavorite
+                        ? '${widget.beer.name} removed from favorites'
+                        : '${widget.beer.name} added to favorites',
+                  ),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.shopping_cart),
             onPressed: () {
               Navigator.push(
                 context,
@@ -52,17 +80,19 @@ class _BeerDetailScreenState extends State<BeerDetailScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(  // Добавляем прокрутку, чтобы избежать переполнения
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Image.asset(widget.beer.image),
             const SizedBox(height: 16),
+
             Text(widget.beer.name, style: AppStyles.getTitleStyle(context)),
             const SizedBox(height: 8),
             Text('Price: \$${widget.beer.price.toStringAsFixed(2)} per liter'),
             const SizedBox(height: 16),
+
             Text('Description:'),
             TextFormField(
               controller: _descriptionController,
@@ -75,33 +105,30 @@ class _BeerDetailScreenState extends State<BeerDetailScreen> {
               },
             ),
             const SizedBox(height: 16),
+
             Text(
               'Enter Quantity (in liters):',
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            // Ограничиваем высоту поля ввода, чтобы оно занимало только половину экрана
-            Container(
-              height: MediaQuery.of(context).size.height / 4,  // Высота поля ввода равна половине экрана
-              child: TextField(
-                controller: _litersController,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(
-                  labelText: 'Liters',
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (value) {
-                  final parsedValue = double.tryParse(value);
-                  if (parsedValue != null && parsedValue > 0) {
-                    setState(() {
-                      _liters = parsedValue;
-                    });
-                  } else {
-                    setState(() {
-                      _liters = 1.0; // Default value if invalid input
-                    });
-                  }
-                },
+            TextField(
+              controller: _litersController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+decoration: const InputDecoration(
+                labelText: 'Liters',
+                border: OutlineInputBorder(),
               ),
+              onChanged: (value) {
+                final parsedValue = double.tryParse(value);
+                if (parsedValue != null && parsedValue > 0) {
+                  setState(() {
+                    _liters = parsedValue;
+                  });
+                } else {
+                  setState(() {
+                    _liters = 1.0; 
+                  });
+                }
+              },
             ),
             const SizedBox(height: 16),
             Text(
@@ -109,6 +136,7 @@ class _BeerDetailScreenState extends State<BeerDetailScreen> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 16),
+
             ElevatedButton(
               onPressed: () {
                 Provider.of<CartProvider>(context, listen: false)

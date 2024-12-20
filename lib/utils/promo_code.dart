@@ -11,7 +11,6 @@ class PromoCode {
     required this.expirationDate,
   });
 
-  // Фабричный метод для создания промокода из JSON
   factory PromoCode.fromJson(Map<String, dynamic> json) {
     return PromoCode(
       name: json['name'],
@@ -20,7 +19,6 @@ class PromoCode {
     );
   }
 
-  // Метод для преобразования в JSON
   Map<String, dynamic> toJson() {
     return {
       'name': name,
