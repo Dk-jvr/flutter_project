@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
-import '../providers/favorites_provider.dart';  // Провайдер для избранного
+import '../providers/favorites_provider.dart';
 import '../beer_data.dart';
 import 'cart_screen.dart';
 import '../styles/app_styles.dart';
@@ -52,7 +52,6 @@ class _BeerDetailScreenState extends State<BeerDetailScreen> {
       appBar: AppBar(
         title: Text(widget.beer.name),
         actions: [
-          // Корзина
           IconButton(
             icon: const Icon(Icons.shopping_cart),
             onPressed: () {
@@ -64,11 +63,13 @@ class _BeerDetailScreenState extends State<BeerDetailScreen> {
               );
             },
           ),
-          // Кнопка избранного
           IconButton(
             icon: Icon(
-              isFavorite ? Icons.favorite : Icons.star_border,
-              color: isFavorite ? Colors.red : Colors.white,
+              shadows: [
+                  Shadow(blurRadius: 3, color: Colors.black)
+              ],
+              isFavorite ? Icons.favorite : Icons.favorite,
+              color: isFavorite ? Colors.red : Colors.white
             ),
             onPressed: () {
               if (isFavorite) {
@@ -91,7 +92,6 @@ class _BeerDetailScreenState extends State<BeerDetailScreen> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Left Section: Image
             Expanded(
               flex: 1,
               child: Image.asset(
@@ -99,29 +99,24 @@ class _BeerDetailScreenState extends State<BeerDetailScreen> {
                 fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(width: 16), // Spacing between image and details
-
-            // Right Section: Details
+            const SizedBox(width: 16),
             Expanded(
               flex: 2,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Name
                   Text(
                     widget.beer.name,
                     style: AppStyles.getTitleStyle(context),
                   ),
                   const SizedBox(height: 8),
 
-                  // Price
                   Text(
                     'Price: \$${widget.beer.price.toStringAsFixed(2)} per liter',
                     style: AppStyles.bodyTextStyle(context),
                   ),
                   const SizedBox(height: 16),
 
-                  // Description
                   Text(
                     'Description:',
                     style: AppStyles.bodyTextStyle(context),
@@ -133,7 +128,6 @@ class _BeerDetailScreenState extends State<BeerDetailScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Save Description Button
                   ElevatedButton(
                     onPressed: _saveDescription,
                     child: const Text('Save Description'),
@@ -141,7 +135,6 @@ class _BeerDetailScreenState extends State<BeerDetailScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Quantity Input
                   Text(
                     'Enter Quantity (in liters):',
                     style: AppStyles.bodyTextStyle(context),
@@ -162,14 +155,12 @@ class _BeerDetailScreenState extends State<BeerDetailScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Selected Quantity
                   Text(
                     'You selected $_liters liters',
                     style: AppStyles.bodyTextStyle(context),
                   ),
                   const SizedBox(height: 16),
 
-                  // Add to Cart Button
                   ElevatedButton(
                     onPressed: () {
                       Provider.of<CartProvider>(context, listen: false)

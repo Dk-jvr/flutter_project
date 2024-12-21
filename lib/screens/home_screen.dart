@@ -7,7 +7,7 @@ import 'beer_detail_screen.dart';
 import 'cart_screen.dart';
 import '../providers/favorites_provider.dart';
 import 'favorites_screen.dart';
-import '../styles/app_styles.dart';  // Импортируем AppStyles
+import '../styles/app_styles.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -71,11 +71,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       leading: Image.asset(beer.image),
                       title: Text(
                         beer.name,
-                        style: AppStyles.getTitleStyle(context),  // Используем стиль из AppStyles
+                        style: AppStyles.getTitleStyle(context),
                       ),
                       subtitle: Text(
                         '\$${beer.price.toStringAsFixed(2)}',
-                        style: AppStyles.bodyTextStyle(context),  // Используем стиль из AppStyles
+                        style: AppStyles.bodyTextStyle(context),
                       ),
                       onTap: () {
                         Navigator.push(

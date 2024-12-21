@@ -80,7 +80,7 @@ class AppStyles {
         );
   }
   static ButtonStyle buttonStyle = ElevatedButton.styleFrom(
-    backgroundColor: Colors.blue, // Use backgroundColor instead of primary
+    backgroundColor: Colors.blue,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8.0),
     ),

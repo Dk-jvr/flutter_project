@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 import '../utils/promo_code_service.dart';
-import '../utils/promo_code.dart'; // Import promo code model
+import '../utils/promo_code.dart';
 import 'dart:math';
-import '../styles/app_styles.dart'; // Import AppStyles for button styles
+import '../styles/app_styles.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -226,13 +226,13 @@ class _CartScreenState extends State<CartScreen> {
                         children: [
                           ElevatedButton(
                             onPressed: _applyPromoCode,
-                            style: AppStyles.buttonStyle, // Use AppStyles here
+                            style: AppStyles.buttonStyle,
                             child: Text('Apply Promo Code'),
                           ),
                           if (_appliedPromoCode != null)
                             ElevatedButton(
                               onPressed: _removePromoCode,
-                              style: AppStyles.buttonStyle, // Use AppStyles here
+                              style: AppStyles.buttonStyle, 
                               child: Text('Remove Promo Code'),
                             ),
                         ],
@@ -283,7 +283,7 @@ class _CartScreenState extends State<CartScreen> {
                           onPressed: _isTermsAccepted
                               ? () => _confirmOrder(context)
                               : null,
-                          style: AppStyles.buttonStyle, // Use AppStyles here
+                          style: AppStyles.buttonStyle,
                           child: Text('Confirm Order'),
                         ),
                       ),
