@@ -7,6 +7,7 @@ import 'beer_detail_screen.dart';
 import 'cart_screen.dart';
 import '../providers/favorites_provider.dart';
 import 'favorites_screen.dart';
+import '../styles/app_styles.dart';  // Импортируем AppStyles
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -68,8 +69,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     final beer = beers[index];
                     return ListTile(
                       leading: Image.asset(beer.image),
-                      title: Text(beer.name),
-                      subtitle: Text('\$${beer.price.toStringAsFixed(2)}'),
+                      title: Text(
+                        beer.name,
+                        style: AppStyles.getTitleStyle(context),  // Используем стиль из AppStyles
+                      ),
+                      subtitle: Text(
+                        '\$${beer.price.toStringAsFixed(2)}',
+                        style: AppStyles.bodyTextStyle(context),  // Используем стиль из AppStyles
+                      ),
                       onTap: () {
                         Navigator.push(
                           context,

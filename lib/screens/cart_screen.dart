@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 import '../utils/promo_code_service.dart';
-import '../utils/promo_code.dart'; // Импортируем модель промокода
+import '../utils/promo_code.dart'; // Import promo code model
 import 'dart:math';
+import '../styles/app_styles.dart'; // Import AppStyles for button styles
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -19,6 +20,8 @@ class _CartScreenState extends State<CartScreen> {
   double _discount = 0.0;
   List<PromoCode> _promoCodes = [];
   PromoCode? _appliedPromoCode;
+  bool _isTermsAccepted = false;
+  bool _isSubscribed = false;
 
   @override
   void initState() {
@@ -123,7 +126,7 @@ class _CartScreenState extends State<CartScreen> {
 
     return Scaffold(
       appBar: AppBar(
-title: Text('Your Cart'),
+        title: Text('Your Cart'),
       ),
       body: cartItems.isEmpty
           ? Center(child: Text('Your cart is empty'))
@@ -223,11 +226,13 @@ title: Text('Your Cart'),
                         children: [
                           ElevatedButton(
                             onPressed: _applyPromoCode,
+                            style: AppStyles.buttonStyle, // Use AppStyles here
                             child: Text('Apply Promo Code'),
                           ),
                           if (_appliedPromoCode != null)
                             ElevatedButton(
                               onPressed: _removePromoCode,
+                              style: AppStyles.buttonStyle, // Use AppStyles here
                               child: Text('Remove Promo Code'),
                             ),
                         ],
@@ -243,9 +248,42 @@ title: Text('Your Cart'),
                           ),
                         ),
                       ),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: _isTermsAccepted,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                _isTermsAccepted = value ?? false;
+                              });
+                            },
+                          ),
+                          Expanded(
+                            child: Text('I agree to the terms and conditions'),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: _isSubscribed,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                _isSubscribed = value ?? false;
+                              });
+                            },
+                          ),
+                          Expanded(
+                            child: Text('Subscribe to notifications'),
+                          ),
+                        ],
+                      ),
                       Center(
                         child: ElevatedButton(
-                          onPressed: () => _confirmOrder(context),
+                          onPressed: _isTermsAccepted
+                              ? () => _confirmOrder(context)
+                              : null,
+                          style: AppStyles.buttonStyle, // Use AppStyles here
                           child: Text('Confirm Order'),
                         ),
                       ),

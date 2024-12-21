@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class AppStyles {
-  // Метод для получения стиля заголовка
   static TextStyle getTitleStyle(BuildContext context) {
     return Theme.of(context).textTheme.titleLarge?.copyWith(
           color: Colors.black,
@@ -15,7 +14,6 @@ class AppStyles {
         ); 
   }
 
-  // Метод для получения стиля для ввода
   static InputDecoration getInputDecoration() {
     return InputDecoration(
       border: OutlineInputBorder(),
@@ -25,7 +23,6 @@ class AppStyles {
     );
   }
 
-  // Метод для получения стиля текста кнопки
   static TextStyle getButtonTextStyle() {
     return TextStyle(
       color: Colors.white,
@@ -34,7 +31,6 @@ class AppStyles {
     );
   }
 
-  // Другие стили, если нужны
   static TextStyle bodyTextStyle(BuildContext context) {
     return Theme.of(context).textTheme.bodyLarge?.copyWith(
           color: Colors.black87,
@@ -54,4 +50,40 @@ class AppStyles {
           fontStyle: FontStyle.italic,
         );
   }
+
+  static TextStyle descriptionStyle(BuildContext context) {
+    return Theme.of(context).textTheme.bodyLarge?.copyWith(
+          color: Colors.black54,
+        ) ??
+        TextStyle(
+          color: Colors.black54,
+        );
+  }
+
+  static TextStyle quantityTextStyle(BuildContext context) {
+    return Theme.of(context).textTheme.titleMedium?.copyWith(
+          color: Colors.black87,
+        ) ??
+        TextStyle(
+          color: Colors.black87,
+        );
+  }
+
+  static TextStyle priceTextStyle(BuildContext context) {
+    return Theme.of(context).textTheme.bodyMedium?.copyWith(
+          color: Colors.green,
+          fontWeight: FontWeight.bold,
+        ) ??
+        TextStyle(
+          color: Colors.green,
+          fontWeight: FontWeight.bold,
+        );
+  }
+  static ButtonStyle buttonStyle = ElevatedButton.styleFrom(
+    backgroundColor: Colors.blue, // Use backgroundColor instead of primary
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8.0),
+    ),
+    padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+  );
 }

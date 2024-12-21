@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
-import '../providers/favorites_provider.dart';
+import '../providers/favorites_provider.dart';  // Провайдер для избранного
 import '../beer_data.dart';
 import 'cart_screen.dart';
 import '../styles/app_styles.dart';
@@ -17,8 +17,8 @@ class BeerDetailScreen extends StatefulWidget {
 
 class _BeerDetailScreenState extends State<BeerDetailScreen> {
   double _liters = 1.0;
-  TextEditingController _descriptionController = TextEditingController();
-  TextEditingController _litersController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _litersController = TextEditingController();
 
   @override
   void initState() {
@@ -34,39 +34,25 @@ class _BeerDetailScreenState extends State<BeerDetailScreen> {
     super.dispose();
   }
 
+  void _saveDescription() {
+    setState(() {
+      widget.beer.description = _descriptionController.text;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Description updated!')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final favoritesProvider = Provider.of<FavoritesProvider>(context);
-    final isFavorite = favoritesProvider.favoriteBeers.contains(widget.beer);
+    bool isFavorite = favoritesProvider.favoriteBeers.contains(widget.beer);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.beer.name),
         actions: [
-          IconButton(
-            icon: Icon(
-              isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: isFavorite ? Colors.red : null,
-            ),
-            onPressed: () {
-              setState(() {
-                if (isFavorite) {
-                  favoritesProvider.removeFromFavorites(widget.beer);
-                } else {
-                  favoritesProvider.addToFavorites(widget.beer);
-                }
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    isFavorite
-                        ? '${widget.beer.name} removed from favorites'
-                        : '${widget.beer.name} added to favorites',
-                  ),
-                ),
-              );
-            },
-          ),
+          // Корзина
           IconButton(
             icon: const Icon(Icons.shopping_cart),
             onPressed: () {
@@ -78,74 +64,127 @@ class _BeerDetailScreenState extends State<BeerDetailScreen> {
               );
             },
           ),
+          // Кнопка избранного
+          IconButton(
+            icon: Icon(
+              isFavorite ? Icons.favorite : Icons.star_border,
+              color: isFavorite ? Colors.red : Colors.white,
+            ),
+            onPressed: () {
+              if (isFavorite) {
+                favoritesProvider.removeFromFavorites(widget.beer);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Removed from favorites')),
+                );
+              } else {
+                favoritesProvider.addToFavorites(widget.beer);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Added to favorites')),
+                );
+              }
+            },
+          ),
         ],
       ),
-      body: SingleChildScrollView(
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset(widget.beer.image),
-            const SizedBox(height: 16),
-
-            Text(widget.beer.name, style: AppStyles.getTitleStyle(context)),
-            const SizedBox(height: 8),
-            Text('Price: \$${widget.beer.price.toStringAsFixed(2)} per liter'),
-            const SizedBox(height: 16),
-
-            Text('Description:'),
-            TextFormField(
-              controller: _descriptionController,
-              decoration: AppStyles.getInputDecoration(),
-              maxLines: 5,
-              onChanged: (value) {
-                setState(() {
-                  widget.beer.description = value;
-                });
-              },
-            ),
-            const SizedBox(height: 16),
-
-            Text(
-              'Enter Quantity (in liters):',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            TextField(
-              controller: _litersController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-decoration: const InputDecoration(
-                labelText: 'Liters',
-                border: OutlineInputBorder(),
+            // Left Section: Image
+            Expanded(
+              flex: 1,
+              child: Image.asset(
+                widget.beer.image,
+                fit: BoxFit.cover,
               ),
-              onChanged: (value) {
-                final parsedValue = double.tryParse(value);
-                if (parsedValue != null && parsedValue > 0) {
-                  setState(() {
-                    _liters = parsedValue;
-                  });
-                } else {
-                  setState(() {
-                    _liters = 1.0; 
-                  });
-                }
-              },
             ),
-            const SizedBox(height: 16),
-            Text(
-              'You selected $_liters liters',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 16),
+            const SizedBox(width: 16), // Spacing between image and details
 
-            ElevatedButton(
-              onPressed: () {
-                Provider.of<CartProvider>(context, listen: false)
-                    .addToCart(widget.beer, _liters);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${widget.beer.name} added to cart!')),
-                );
-              },
-              child: Text('Add to Cart', style: AppStyles.getButtonTextStyle()),
+            // Right Section: Details
+            Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Name
+                  Text(
+                    widget.beer.name,
+                    style: AppStyles.getTitleStyle(context),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Price
+                  Text(
+                    'Price: \$${widget.beer.price.toStringAsFixed(2)} per liter',
+                    style: AppStyles.bodyTextStyle(context),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Description
+                  Text(
+                    'Description:',
+                    style: AppStyles.bodyTextStyle(context),
+                  ),
+                  TextFormField(
+                    controller: _descriptionController,
+                    decoration: AppStyles.getInputDecoration(),
+                    maxLines: 5,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Save Description Button
+                  ElevatedButton(
+                    onPressed: _saveDescription,
+                    child: const Text('Save Description'),
+                    style: AppStyles.buttonStyle,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Quantity Input
+                  Text(
+                    'Enter Quantity (in liters):',
+                    style: AppStyles.bodyTextStyle(context),
+                  ),
+                  TextField(
+                    controller: _litersController,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    decoration: AppStyles.getInputDecoration(),
+                    onChanged: (value) {
+                      final parsedValue = double.tryParse(value);
+                      if (parsedValue != null && parsedValue > 0) {
+                        setState(() {
+                          _liters = parsedValue;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Selected Quantity
+                  Text(
+                    'You selected $_liters liters',
+                    style: AppStyles.bodyTextStyle(context),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Add to Cart Button
+                  ElevatedButton(
+                    onPressed: () {
+                      Provider.of<CartProvider>(context, listen: false)
+                          .addToCart(widget.beer, _liters);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${widget.beer.name} added to cart!'),
+                        ),
+                      );
+                    },
+                    child: const Text('Add to Cart'),
+                    style: AppStyles.buttonStyle,
+                  ),
+                ],
+              ),
             ),
           ],
         ),

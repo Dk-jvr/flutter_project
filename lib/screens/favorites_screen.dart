@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/favorites_provider.dart';
-import '../beer_data.dart';
-import 'beer_detail_screen.dart';
 
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
@@ -23,16 +21,9 @@ class FavoritesScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final beer = favoriteItems[index];
                 return ListTile(
-                  leading: Image.asset(beer.image, width: 50),
+                  leading: Image.asset(beer.image),
                   title: Text(beer.name),
                   subtitle: Text('\$${beer.price.toStringAsFixed(2)}'),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (ctx) => BeerDetailScreen(beer: beer),
-                      ),
-                    );
-                  },
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () {
